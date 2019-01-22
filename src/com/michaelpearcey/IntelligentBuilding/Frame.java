@@ -12,18 +12,17 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.ArcType;
 import javafx.stage.Stage;
-
-import static javafx.scene.paint.Color.*;
 
 public class Frame extends Application {
 
-    private final String title = "Intelligent Building";
     private final int width = 1200, height = 800;
     private final int paddingTop = 5, paddingSide = 2;
     private final int canvasX = 5, canvasY = 50, canvasWidth = 850, canvasHeight = 780;
+    private final String title = "Intelligent Building";
+    public static GraphicsContext gc;
+    public static Stage primaryStage;
+    private Building activeBuilding;
     private BorderPane root;
     private Menu mFile, mConfig, mHelp;
     private MenuItem mNew, mSave, mLoad, mExit, mSettings, mClear, mWhat, mAbout;
@@ -32,36 +31,15 @@ public class Frame extends Application {
         Application.launch();
     }
 
-    private void drawShapes(GraphicsContext gc) {
-        gc.setFill(GREEN);
-        gc.setStroke(BLUE);
-        gc.setLineWidth(5);
-        gc.strokeLine(40, 10, 10, 40);
-        gc.fillOval(10, 60, 30, 30);
-        gc.strokeOval(60, 60, 30, 30);
-        gc.fillRoundRect(110, 60, 30, 30, 10, 10);
-        gc.strokeRoundRect(160, 60, 30, 30, 10, 10);
-        gc.fillArc(10, 110, 30, 30, 45, 240, ArcType.OPEN);
-        gc.fillArc(60, 110, 30, 30, 45, 240, ArcType.CHORD);
-        gc.fillArc(110, 110, 30, 30, 45, 240, ArcType.ROUND);
-        gc.strokeArc(10, 160, 30, 30, 45, 240, ArcType.OPEN);
-        gc.strokeArc(60, 160, 30, 30, 45, 240, ArcType.CHORD);
-        gc.strokeArc(110, 160, 30, 30, 45, 240, ArcType.ROUND);
-        gc.fillPolygon(new double[]{10, 40, 10, 40},
-                new double[]{210, 210, 240, 240}, 4);
-        gc.strokePolygon(new double[]{60, 90, 60, 90},
-                new double[]{210, 210, 240, 240}, 4);
-        gc.strokePolyline(new double[]{110, 140, 110, 140},
-                new double[]{210, 210, 240, 240}, 4);
-    }
-
     @Override
     public void start(Stage primaryStage) {
+        this.primaryStage = primaryStage;
         primaryStage.setTitle(title);
-        Button btn = new Button();
         Canvas canvas = new Canvas(canvasWidth, canvasHeight);
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        drawShapes(gc);
+        gc = canvas.getGraphicsContext2D();
+        activeBuilding = new Building();
+        activeBuilding.fillDefault();
+        activeBuilding.draw();
         canvas.setTranslateX(canvasX);
         canvas.setTranslateY(canvasY);
         root = new BorderPane();
@@ -140,9 +118,12 @@ public class Frame extends Application {
         });
     }
 
-    void newBuilding() {}
+    void newBuilding() {
+        activeBuilding.clear();
+        gc.clearRect(0, 0, canvasWidth, canvasHeight);
+    }
 
-    void saveBuilding() {}
+    void saveBuilding() {activeBuilding.toFile();}
 
     void loadBuilding() {}
 
