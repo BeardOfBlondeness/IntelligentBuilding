@@ -17,8 +17,9 @@ public class Building extends ArrayList<Room> implements Serializable {
     private int targetX, targetY, targetRoom, xS, yS;
     private int toRoom = 0;
     private boolean greenFlashing = false;
+    private ArrayList<Item> items;
 
-    public Building() {}
+    public Building() {items = new ArrayList<Item>();}
 
     public void addPerson() {
         Random ran = new Random();
@@ -39,6 +40,9 @@ public class Building extends ArrayList<Room> implements Serializable {
             GraphicsContext gc = Frame.gc;
             gc.setFill(GREEN);
             gc.fillRect(xS, yS, 20, 20);
+        }
+        if(items.size() > 0) {
+            for(Item i : items) i.draw();
         }
     }
 
@@ -116,6 +120,7 @@ public class Building extends ArrayList<Room> implements Serializable {
     }
 
     private void updateTarget() {
+        if(size() == 1) targetRoom = 0;
         if(size() > 0) {
             Room r = get(targetRoom);
             if(p.getX() == targetX && p.getY() == targetY) {
@@ -129,6 +134,13 @@ public class Building extends ArrayList<Room> implements Serializable {
                 } else if(toRoom == 1) {
                     ranPosInRoom();
                 } else if(toRoom == 2) {
+                    Random ran = new Random();
+                    int ranItem = ran.nextInt(3);
+                    switch(ranItem) {
+                        case 0: items.add(new Light(targetX, targetY)); break;
+                        case 1: items.add(new Table(targetX, targetY)); break;
+                        case 2: items.add(new Toilet(targetX, targetY)); break;
+                    }
                     targetX = get(targetRoom).getDoorNextCoords().x;
                     targetY = get(targetRoom).getDoorNextCoords().y;
                     toRoom = 0;
@@ -149,7 +161,7 @@ public class Building extends ArrayList<Room> implements Serializable {
         int doorInt = 0;
         if(yE < 15) doorInt = 2;
         else if(yS/20 > 10) doorInt = 0;
-        int doorPos = r.nextInt(3);
+        int doorPos = r.nextInt(3) + 2;
         add(new Room(xS/20, yS/20, xE-(xS/20), yE-(yS/20), new Point(doorInt, doorPos)));
         Frame.setText(toString());
     }

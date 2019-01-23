@@ -95,13 +95,13 @@ public class Room implements Serializable {
     public Point getDoorNextCoords() {
         switch(door.x) {
             case 0:
-                return new Point(door.y*multiplier+lineWidth/2, (y+1)*multiplier);
+                return new Point((door.y+x)*multiplier+lineWidth/2, (y+1)*multiplier);
             case 1:
-                return new Point((x+width-1)*multiplier, door.y*multiplier+lineWidth/2);
+                return new Point((x+width-1)*multiplier, (door.y+y)*multiplier+lineWidth/2);
             case 2:
-                return new Point(door.y*multiplier+lineWidth/2, (y+height-1)*multiplier);
+                return new Point((door.y+x)*multiplier+lineWidth/2, (y+height-1)*multiplier);
             case 3:
-                return new Point((x+1)*multiplier, door.y*multiplier+lineWidth/2);
+                return new Point((x+1)*multiplier, (door.y+y)*multiplier+lineWidth/2);
             default:
                 return new Point(0, 0);
         }
@@ -110,13 +110,13 @@ public class Room implements Serializable {
     public Point getDoorCoords() {
         switch(door.x) {
             case 0:
-                return new Point(door.y*multiplier+lineWidth/2, (y)*multiplier);
+                return new Point((door.y+x)*multiplier+lineWidth/2, (y)*multiplier);
             case 1:
-                return new Point((x+width)*multiplier, door.y*multiplier+lineWidth/2);
+                return new Point((x+width)*multiplier, (door.y+y)*multiplier+lineWidth/2);
             case 2:
-                return new Point(door.y*multiplier+lineWidth/2, (y+height)*multiplier);
+                return new Point((door.y+x)*multiplier+lineWidth/2, (y+height)*multiplier);
             case 3:
-                return new Point((x)*multiplier, door.y*multiplier+lineWidth/2);
+                return new Point((x)*multiplier, (door.y+y)*multiplier+lineWidth/2);
             default:
                 return new Point(0, 0);
         }
