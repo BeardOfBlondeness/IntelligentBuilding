@@ -8,23 +8,32 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextBuilder;
 import javafx.stage.Stage;
+
+import static javafx.scene.paint.Color.GREEN;
 
 public class Frame extends Application {
 
     private final int width = 1200, height = 800;
     private final int paddingTop = 5, paddingSide = 2;
-    private final int canvasX = 5, canvasY = 50, canvasWidth = 850, canvasHeight = 780;
+    private static final int canvasX = 5, canvasY = 50, canvasWidth = 850, canvasHeight = 780;
     private final String title = "Intelligent Building";
     public static GraphicsContext gc;
     public static Stage primaryStage;
+    private boolean firstClick = true;
     private Building activeBuilding;
-    private BorderPane root;
+    private static BorderPane root;
     private Menu mFile, mConfig, mHelp;
+    private static Text t;
     private MenuItem mNew, mSave, mLoad, mExit, mSettings, mClear, mWhat, mAbout;
 
     public static void main(String[] args) {
@@ -39,6 +48,7 @@ public class Frame extends Application {
         gc = canvas.getGraphicsContext2D();
         activeBuilding = new Building();
         activeBuilding.fillDefault();
+        activeBuilding.addPerson();
         activeBuilding.draw();
         canvas.setTranslateX(canvasX);
         canvas.setTranslateY(canvasY);
@@ -46,8 +56,21 @@ public class Frame extends Application {
         root.setPadding(new Insets(paddingTop, paddingSide, paddingTop, paddingSide));
         root.setTop(setMenu());
         root.getChildren().add(canvas);
+        t = TextBuilder.create().text(activeBuilding.toString()).build();
+        t.setX(950);
+        t.setY(50);
+        root.getChildren().add(t);
         primaryStage.setScene(new Scene(root, width, height));
         primaryStage.show();
+        canvas.setOnMouseClicked(event -> {
+            if(firstClick) {
+                activeBuilding.setStart((int)(event.getX()/20)*20, (int)(event.getY()/20)*20);
+                firstClick = false;
+            } else {
+                activeBuilding.setEnd((int)(event.getX()/20), (int)(event.getY()/20));
+                firstClick = true;
+            }
+        });
     }
 
     /**
@@ -118,21 +141,37 @@ public class Frame extends Application {
         });
     }
 
-    void newBuilding() {
-        activeBuilding.clear();
-        gc.clearRect(0, 0, canvasWidth, canvasHeight);
+    public static void setText(String text) {
+        t = TextBuilder.create().text(text).build();
+        t.setX(950);
+        t.setY(50);
+        root.getChildren().add(t);
     }
 
-    void saveBuilding() {activeBuilding.toFile();}
+    void newBuilding() {
+        clearBuilding();
+    }
 
-    void loadBuilding() {}
+    void saveBuilding() {
+        activeBuilding.toFile();
+    }
+
+    void loadBuilding() {
+        activeBuilding.fromFile();
+    }
 
     void showSettings() {}
 
-    void clearBuilding() {}
+    void clearBuilding() {
+        activeBuilding.clear();
+    }
 
     void showHelp() {}
 
     void showAbout() {}
+
+    public static void clearGC() {
+        gc.clearRect(0, 0, canvasWidth, canvasHeight);
+    }
 
 }

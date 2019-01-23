@@ -1,18 +1,18 @@
 package com.michaelpearcey.IntelligentBuilding;
 
 import javafx.scene.canvas.GraphicsContext;
-
 import java.awt.*;
-
+import java.io.Serializable;
+import java.util.Random;
 import static javafx.scene.paint.Color.BLUE;
 import static javafx.scene.paint.Color.WHITE;
 
-public class Room {
+public class Room implements Serializable {
 
     private final int multiplier = 20, lineWidth = 20, offset = 10;
     private int x, y, width, height;
     private Point door;
-    private GraphicsContext gc;
+    private Person p;
 
     public Room(int x, int y, int width, int height, Point door) {
         this.x = x;
@@ -20,14 +20,50 @@ public class Room {
         this.width = width;
         this.height = height;
         this.door = door;
-        gc = Frame.gc;
     }
 
-    public Room() {}
+    public Point addPerson() {
+        Random ran = new Random();
+        int ranX = ran.nextInt(width-2);
+        int ranY = ran.nextInt(height-2);
+        int xPos = (x+ranX+1) * multiplier;
+        int yPos = (y+ranY+1) * multiplier;
+        return new Point(xPos, yPos);
+    }
 
-    public int getX() { return x; }
+    public int ranX() {
+        Random ran = new Random();
+        return (ran.nextInt(width-2) + 1 + x)*multiplier;
+    }
+
+    public int ranY() {
+        Random ran = new Random();
+        return (ran.nextInt(height-2) + 1 + y)*multiplier;
+    }
+
+    public String toString() {
+        String ret = "";
+        ret = ret + "Room at: " + Integer.toString(x) + "," + Integer.toString(y) + " to " + Integer.toString(x+width) + "," + Integer.toString(y+height);
+        switch(door.x) {
+            case 0:
+                ret = ret + "\nDoor on top wall at: ";
+                break;
+            case 1:
+                ret = ret + "\nDoor on right wall at: ";
+                break;
+            case 2:
+                ret = ret + "\nDoor on bottom wall at: ";
+                break;
+            case 3:
+                ret = ret + "\nDoor on left wall at: ";
+                break;
+        }
+        ret = ret + Integer.toString(door.y);
+        return ret;
+    }
 
     public void draw() {
+        GraphicsContext gc = Frame.gc;
         gc.setStroke(BLUE);
         gc.setLineWidth(lineWidth);
         gc.strokeLine(x*multiplier+offset, y*multiplier+offset, (x+width)*multiplier+offset, y*multiplier+offset);
@@ -38,6 +74,7 @@ public class Room {
     }
 
     private void drawDoor() {
+        GraphicsContext gc = Frame.gc;
         gc.setFill(WHITE);
         switch(door.x) {
             case 0:
@@ -55,39 +92,33 @@ public class Room {
         }
     }
 
-    public void setX(int x) {
-        this.x = x;
+    public Point getDoorNextCoords() {
+        switch(door.x) {
+            case 0:
+                return new Point(door.y*multiplier+lineWidth/2, (y+1)*multiplier);
+            case 1:
+                return new Point((x+width-1)*multiplier, door.y*multiplier+lineWidth/2);
+            case 2:
+                return new Point(door.y*multiplier+lineWidth/2, (y+height-1)*multiplier);
+            case 3:
+                return new Point((x+1)*multiplier, door.y*multiplier+lineWidth/2);
+            default:
+                return new Point(0, 0);
+        }
     }
 
-    public int getY() {
-        return y;
-    }
-
-    public void setY(int y) {
-        this.y = y;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
-    public Point getDoor() {
-        return door;
-    }
-
-    public void setDoor(Point door) {
-        this.door = door;
+    public Point getDoorCoords() {
+        switch(door.x) {
+            case 0:
+                return new Point(door.y*multiplier+lineWidth/2, (y)*multiplier);
+            case 1:
+                return new Point((x+width)*multiplier, door.y*multiplier+lineWidth/2);
+            case 2:
+                return new Point(door.y*multiplier+lineWidth/2, (y+height)*multiplier);
+            case 3:
+                return new Point((x)*multiplier, door.y*multiplier+lineWidth/2);
+            default:
+                return new Point(0, 0);
+        }
     }
 }
